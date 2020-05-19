@@ -1,0 +1,200 @@
+/*
+ * Author: Noa Apelker
+ * Mamman 14
+ * 2020a
+ * */
+
+public class Main {
+
+    /**
+     * The function get a string and check how many substring start and end with the given char and
+     * contain it exactly one time
+     *
+     * @param s the string to check and count the explained string format
+     * @param c the char to check with
+     * @return how many sub string start and end with the char c and contain exactly one inside
+     * Time complexity O(n)
+     * Space complexity O(1)
+     */
+    public static int subStrC(String s, char c) {
+        int counter = -2;
+
+        //Go through the string and count the given char amount
+        for (int i = 0; i < s.length(); i++)
+            if (s.charAt(i) == c)
+                counter++;
+
+        //Return the calculation
+        return counter > 0 ? counter : 0;
+    }
+
+    /**
+     * The function get string, char and integer value and calculate substrings start
+     * and end with the char and contain it maximum the integer value
+     *
+     * @param s the string to calculate her substrings
+     * @param c the char to check with
+     * @param k the maximum chars the substring can contain
+     * @return calculation of substring contain maximum k times the char c
+     * Time complexity O(n)
+     * Space complexity O(1)
+     */
+    public static int subStrMaxC(String s, char c, int k) {
+
+        //the given char counter in the string
+        int counterC = 0;
+
+        //Go through the string and count how many of the given char the string contains
+        for (int i = 0; i < s.length(); i++)
+            if (s.charAt(i) == c)
+                counterC++;
+
+        //Set k to the minimum of k and max possible times of the char the string can contain
+        k = counterC - 2 < k ? counterC - 2 : k;
+
+        //Formula to calculate the substrings
+        //The calculation is sum if three columns
+        return counterC * (k + 1) - (k * (k + 1) / 2) - k - 1;
+    }
+
+    /**
+     * The function get an array and set each value in the array to their distance from zero value
+     *
+     * @param a the array to set
+     *          Time complexity O(n)
+     *          Space complexity O(1)
+     */
+    private static void zeroDistance(int[] a) {
+        int index = a[0] == 0 ? 0 : -1;
+
+        //Go through all array search for zero's and set the values accordingly
+        for (int i = 1; i < a.length - 1; i++)
+
+            //Check if the value is zero and has 1 between the two index's
+            if (a[i] == 0 && i - index > 1) {
+
+                //Call the function to set the values between the index's
+                distanceBetween(index, i, a);
+                index = i;
+            }
+
+        //Set the rest of the array
+        distanceBetween(index, a[a.length - 1] == 0 ? a.length - 1 : a.length, a);
+    }
+
+    /**
+     * The function get two index's and set the array to their distance from zero value
+     *
+     * @param index1 the first index
+     * @param index2 the second index
+     * @param a      the array to set
+     *               Time complexity O(n)
+     *               Space complexity O(1)
+     */
+    private static void distanceBetween(int index1, int index2, int[] a) {
+
+        //Set in case that the first value in the array isn't zero
+        if (index1 == -1)
+
+            //Go through the array and set the min distance from zero
+            for (int i = index1 + 1; i < index2; i++)
+                a[i] = index2 - i;
+
+            //Set in case that the last value in the array isn't zero
+        else if (index2 == a.length)
+
+            //Go through the array and set the min distance from zero
+            for (int i = index1 + 1; i < index2; i++)
+                a[i] = i - index1;
+
+            //Set in case that the start and end index's are zeros
+        else
+
+            //Go through the array and set the min distance from zero
+            for (int i = index1 + 1; i < index2; i++)
+                a[i] = Math.min(i - index1, index2 - i);
+    }
+
+    /**
+     * The function get original string and transformed string and check if the transformed string
+     * is valid- contain all of the original chars in the same order
+     *
+     * @param s the original string
+     * @param t the new string
+     * @return true if the transformed string is valid and false otherwise
+     */
+    public static boolean isTrans(String s, String t) {
+        if (s.length() == 0)
+            return true;
+
+        //Check if there is any unnecessary duplications in the transformed string
+        if (s.length() > 1 && s.charAt(1) != s.charAt(0) && t.length() > 1 && t.charAt(0) == t.charAt(1))
+
+            //Call the function to check the rest of the string after remove un relevant char duplication at the transform string
+            return s.charAt(0) == t.charAt(0) && isTrans(s.substring(1), afterValue(t, t.charAt(0)));
+
+        //Call the function to check the rest of the string
+        return s.charAt(0) == t.charAt(0) && isTrans(s.substring(1), t.substring(1));
+    }
+
+    /**
+     * The function get string and char and remove any row duplication
+     *
+     * @param t the sting to remove duplication
+     * @param c the char to check
+     * @return the given string after remove duplication
+     */
+    private static String afterValue(String t, char c) {
+
+        //Check if need to remove more chars
+        if (t.length() == 0 || t.charAt(0) != c)
+            return t;
+
+        //Call the function to check the rest of the string
+        return afterValue(t.substring(1), c);
+    }
+
+    /**
+     * The function get matrix and calculate haw many valid paths exist
+     * valid path- start from the first row and col in the matrix to the last ones by moving
+     * according to the matrix value in those index's-each digit represent possible move in the row and col.
+     *
+     * @param mat the matrix to calculate her paths amount
+     * @return paths amount
+     */
+    public static int countPaths(int[][] mat) {
+
+        //Call the function that calculate valid paths
+        return (countPaths(mat, 0, 0));
+    }
+
+    /**
+     * The function calculate how many paths there is in the given matrix.
+     * Valid path- start from the first row and col in the matrix to the last ones by moving
+     * according to the matrix value in those index's-each digit represent possible move in the row and col.
+     *
+     * @param mat the matrix to calculate it valid paths
+     * @param row the current row index to check
+     * @param col the current column index to check
+     * @return the paths amount calculation
+     */
+    public static int countPaths(int[][] mat, int row, int col) {
+
+        //Check if the current row and col are valid
+        if (mat.length <= row || mat[0].length <= col)
+            return 0;
+
+        //Check if the current row and col are the last one
+        if (row == mat.length - 1 && col == mat[0].length - 1)
+
+            //The path is until the last cell
+            return 1;
+
+        //The matrix value at the current row and column
+        int newVal = mat[row][col];
+
+        //Call the function to check and calculate possible paths and return the valid paths amount
+        return countPaths(mat, newVal / 10 + row, newVal % 10 + col) +
+                countPaths(mat, newVal % 10 + row, newVal / 10 + col);
+    }
+}
