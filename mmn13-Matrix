@@ -1,0 +1,221 @@
+
+/**
+ * Maman 13 q1
+ * This class represent 2d image in black and white by colors
+ * Author: Noa Apelker
+ * Date: 27/12/19
+ */
+
+public class Matrix {
+
+    //The matrix property
+    private int[][] array;
+    private final static int MAX_VALUE = 255;
+
+    /**
+     * Constructor
+     * Get a matrix and create a matrix with his value
+     *
+     * @param array the matrix to copy
+     */
+    public Matrix(int[][] array) {
+
+        //Set the matrix's rows and cols
+        this.array = new int[array.length][array[0].length];
+
+        //Go trough all the matrix and set her values
+        for (int i = 0; i < array.length; i++)
+            for (int j = 0; j < array[i].length; j++)
+                this.array[i][j] = array[i][j];
+
+    }
+
+    /**
+     * Constructor
+     * Set the matrix rows and cols by the given parameters
+     *
+     * @param size1 the roes
+     * @param size2 the cols
+     */
+    public Matrix(int size1, int size2) {
+        this.array = new int[size1][size2];
+    }
+
+    /**
+     * The function return the matrix value's with line space between each row and tab
+     * space in each value
+     *
+     * @return the created string
+     */
+    public String toString() {
+
+        String strArray = "";
+
+        //Go trough all the matrix and add the value to the string in the format
+        for (int i = 0; i < this.array.length; i++) {
+            for (int j = 0; j < this.array[i].length - 1; j++) {
+
+                //Add tab space between each value if its not the last value in line
+                strArray += this.array[i][j] + "\t";
+            }
+            strArray += this.array[i][this.array[i].length - 1];
+
+            //Go to the next line
+            strArray += "\n";
+        }
+        return strArray;
+    }
+
+    /**
+     * The function get a row, column and a value and set the matrix to the value
+     *
+     * @param row   the row to set in
+     * @param col   the column to set the value
+     * @param value the value
+     */
+    private void setPlace(int row, int col, int value) {
+
+        //Set the cell in the matrix
+        this.array[row][col] = value;
+    }
+
+    /**
+     * The function create new matrix with the difference values between the current value and 255
+     * The changed value become the opposite color value
+     *
+     * @return the negative matrix
+     */
+    public Matrix makeNegative() {
+
+
+        //Create a new matrix
+        Matrix negMatrix = new Matrix(this.array.length, this.array[0].length);
+
+        //Go through all the matrix
+        for (int i = 0; i < this.array.length; i++) {
+
+            for (int j = 0; j < this.array[0].length; j++) {
+
+                //Set the new matrix to the difference between her value and 255
+                negMatrix.array[i][j] = MAX_VALUE - (this.array[i][j]);
+            }
+        }
+        return negMatrix;
+    }
+
+    /**
+     * The function get an index and return the average value with the neighbors
+     *
+     * @param row the row to check
+     * @param col the col to check
+     * @return the given cell average calculation
+     */
+    private int getAverageOfMid(int row, int col) {
+
+        //Sum counter
+        int sum = 0;
+
+        //Counter of added cells
+        int counter = 0;
+
+        //Go through all the cell neighbors
+        for (int r = row - 1; r <= row + 1; r++) {
+
+            for (int c = col - 1; c <= col + 1; c++) {
+
+                //Check if the cell is valid
+                if (r >= 0 && r < this.array.length && c >= 0 && c < this.array[0].length) {
+
+                    //Add the cell value
+                    sum += this.array[r][c];
+                    counter++;
+                }
+            }
+        }
+        //Return the average calculation
+        return sum / counter;
+    }
+
+
+    /**
+     * The function create an image average of the matrix
+     *
+     * @return the created image
+     */
+    public Matrix imageFilterAverage() {
+
+        //Create new matrix with the current matrix variables
+        Matrix filterMat = new Matrix(this.array.length, this.array[0].length);
+
+        //Go trough all the matrix
+        for (int i = 0; i < this.array.length; i++) {
+
+            for (int j = 0; j < this.array[i].length; j++) {
+
+                //Call the function to create an average of the current cell
+                //Set the cell variable to the average calculation
+                filterMat.array[i][j] = this.getAverageOfMid(i, j);
+            }
+        }
+        return filterMat;
+    }
+
+    /**
+     * The function create a new matrix with the same value like original
+     * rotated 90 degrees nonClockwise
+     *
+     * @return the create matrix
+     */
+    public Matrix rotateCounterClockwise() {
+
+        //Total columns of Original Matrix
+        int rowsRotateMat = this.array[0].length;
+
+        //Total rows of Original Matrix
+        int colsRotateMat = this.array.length;
+
+        //Create a new matrix
+        Matrix rotatedMatrix = new Matrix(rowsRotateMat, colsRotateMat);
+
+        //Go through all the matrix and rotate her rows and column
+        for (int i = 0; i < this.array.length; i++) {
+
+            for (int j = 0; j < this.array[0].length; j++) {
+
+                //Set the new matrix with the rotated values
+                rotatedMatrix.array[rowsRotateMat - 1- j][i]= this.array[i][j];
+            }
+        }
+        //Return the created matrix
+        return rotatedMatrix;
+    }
+
+    /**
+     * The function create a new matrix with the same value like original rotated 90 degrees Clockwise
+     *
+     * @return the created matrix
+     */
+    public Matrix rotateClockwise() {
+
+        //Total columns of Original Matrix
+        int rows = this.array[0].length;
+
+        //Total rows of Original Matrix
+        int cols = this.array.length;
+
+        //Create new matrix
+        Matrix rotatedMatrix = new Matrix(rows, cols);
+
+        //Go trough all the original matrix and rotate her rows and column
+        for (int i = 0; i < this.array.length; i++) {
+
+            for (int j = 0; j < this.array[0].length; j++) {
+
+                //Set the new matrix with the rotated values
+                rotatedMatrix.array[j][cols-1-i]= this.array[i][j];
+            }
+        }
+        //Return the created matrix
+        return rotatedMatrix;
+    }
+}
