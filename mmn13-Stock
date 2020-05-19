@@ -1,0 +1,398 @@
+/**
+ * Maman 13 q1
+ * This class represent the current stock in the supermarket
+ * Author: Noa Apelker
+ * Date: 27/12/19
+ */
+
+public class Stock {
+
+    //An array of all the supermarket food items
+    private FoodItem[] _stock;
+
+    //The food items amount
+    private int _numOfItems;
+
+    //Maximum size of array _stock of food items
+    private final static int MAX_FOOD_ITEMS = 100;
+
+    public Stock() {
+
+        //Set the array to the maximum size
+        this._stock = new FoodItem[MAX_FOOD_ITEMS];
+    }
+
+    /**
+     * Get function.
+     *
+     * @return the amount of food items
+     */
+    public int getNumOfItems() {
+        return this._numOfItems;
+    }
+
+    /**
+     * The function add the given food item to the stock is its possible
+     * Object already exist, add the quantity to the exist object
+     * Object exist but with different dates(production or/and expiry) - add it before the exist object
+     * Object doesnt exist and there is place on the stock- add it to the end of the array
+     *
+     * @param newItem the item to add
+     * @return true if the object added successfully and false otherwise
+     */
+    public boolean addItem(FoodItem newItem) {
+
+        //While we didnt add any object and there is still objects to compere with in the stock
+        for (int i = 0; i < this._numOfItems; i++) {
+
+            //Check if there is object in the stock with the same name and catalog name
+            if (this.checkEquals(this._stock[i], newItem)) {
+
+                //Check if there is the same object in stock
+                if (this._stock[i].equals(newItem)) {
+
+                    //This object already existed on stock
+                    //Add the given food item's quantity to the exist food item
+                    this._stock[i].setQuantity(this._stock[i].getQuantity() + newItem.getQuantity());
+                } else {
+                    if (this._numOfItems < MAX_FOOD_ITEMS)
+                        this.addBefore(i, newItem);
+                    else
+                        return false;
+                }
+
+                //Update that the item was added
+                return true;
+            } else if ((newItem.getCatalogueNumber()) < this._stock[i].getCatalogueNumber()) {
+                this.addBefore(i, newItem);
+                return true;
+            }
+
+        }
+
+        //Check if we didnt add the object and there is place on the store
+        if (this._numOfItems < MAX_FOOD_ITEMS) {
+
+            //There isn't food item on stock similar to the given food item
+            //There is place on store to add him- add to the end of the array
+            this._stock[this._numOfItems] = newItem;
+
+            //Add one item to stock
+            this._numOfItems++;
+
+            //Update that the item was added
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Add the given item to the stock array before in the given index
+     *
+     * @param index   the foodItem's index
+     * @param itemNew the item to insert
+     */
+    private void addBefore(int index, FoodItem itemNew) {
+
+        //Go through the stock from the given index and shift left each item
+        for (int i = this._numOfItems; i > index; i--) {
+            this._stock[i] = this._stock[i - 1];
+        }
+
+        //Set stock in the given index to the given food item
+        this._stock[index] = itemNew;
+
+        //Add one item to stock
+        this._numOfItems++;
+    }
+
+    /**
+     * The function get two food items objects and check if their name and catalog are similar
+     *
+     * @param fItem1 the first object
+     * @param fItem2 the second object
+     * @return true if their name and catalog name equals and false otherwise
+     */
+    private boolean checkEquals(FoodItem fItem1, FoodItem fItem2) {
+
+        //Return true if their name and catalog name equals and false otherwise
+        return (fItem1.getName().equals(fItem2.getName()) &&
+                fItem1.getCatalogueNumber() == fItem2.getCatalogueNumber());
+    }
+
+    /**
+     * Check which food the store need to order according to the given amount
+     *
+     * @param amount the min amount we need to have from each food item
+     * @return String holding the Food item's names the store need to order
+     * in format "name1, name2, name3"
+     */
+    public String order(int amount) {
+
+        String orderList = "";
+
+        //Holds the amount of specific product regardless the date
+        int count;
+
+        //The product name
+        String productName;
+
+        //The catalog number of the food item
+        long catalogNumber;
+
+        //Check if there is any food items in stock
+        if (this._numOfItems > 0) {
+            FoodItem firstItem = this._stock[0];
+
+            //Set the parameters to the first food item
+            catalogNumber = firstItem.getCatalogueNumber();
+            productName = firstItem.getName();
+            count = firstItem.getQuantity();
+        } else
+            return "";
+
+        //Go through all the food items
+        for (int i = 1; i < this._numOfItems; i++) {
+
+            FoodItem curItem = this._stock[i];
+            if (curItem.getName().equals(productName) &&
+                    curItem.getCatalogueNumber() == catalogNumber)
+
+                //Add the food item quantity to the calculation
+                count += curItem.getQuantity();
+            else {
+
+                //Check if the calculate amount is smaller then the given one.
+                if (count < amount)
+
+                    //Add this item to the order list
+                    orderList += ", " + productName;
+
+                count = curItem.getQuantity();
+                productName = curItem.getName();
+                catalogNumber = curItem.getCatalogueNumber();
+            }
+        }
+
+        //Check if the calculate amount is smaller then the given one.
+        if (count < amount)
+
+            //Add this item to the order list
+            orderList += ", " + productName;
+        if (orderList.equals(""))
+            return "";
+
+        return orderList.substring(2);
+    }
+
+    /**
+     * The function check how many food items can move to a fridge with the given temperature
+     *
+     * @param temp the fridge temperature
+     * @return the sum of food items that can move
+     */
+    public int howMany(int temp) {
+
+        //The sum of the FoodItems that fits to the given temperature
+        int count = 0;
+
+        //Go through all the food items
+        for (int i = 0; i < this._numOfItems; i++) {
+
+            //The current food item to check
+            FoodItem foodI = this._stock[i];
+
+            //Checking if the current food item fits to the given temperature
+            if (foodI.getMinTemperature() <= temp && foodI.getMaxTemperature() >= temp)
+
+                //Add this amount to the calculation
+                count += foodI.getQuantity();
+        }
+        return count;
+    }
+
+    /**
+     * The function receive date
+     *
+     * @param d the date to check with
+     */
+    public void removeAfterDate(Date d) {
+
+        //Go through all the array
+        for (int i = 0; i < this._numOfItems; i++) {
+
+            //Check if the item expiry date is before the given date
+            if (this._stock[i].getExpiryDate().before(d)) {
+
+                //Delete the item from the array
+                this.deleteFoodItemFromArray(i);
+                i--;
+            }
+        }
+    }
+
+    /**
+     * The function get index and delete the food item in this index
+     *
+     * @param index the food item to delete index
+     */
+    private void deleteFoodItemFromArray(int index) {
+
+        //Go through the array and delete the object without living any holes
+        for (int i = index; i < this._numOfItems - 1; i++) {
+            this._stock[i] = this._stock[i + 1];
+        }
+        //Removing the last item in the array
+        this._stock[this._numOfItems - 1] = null;
+
+        //Reduce the items sum
+        this._numOfItems--;
+    }
+
+    /**
+     * The function check which food item is the most expensive
+     *
+     * @return if the array is empty, null if not, the most expensive food item
+     */
+    public FoodItem mostExpensive() {
+
+        //Holds the first food item (or null when array is empty)
+        FoodItem foodItemExpensive = this._stock[0];
+        for (int i = 1; i < this._numOfItems; i++) {
+
+            //Check if the next item more then the items before him
+            if (this._stock[i].getPrice() > foodItemExpensive.getPrice())
+
+                //Set him to the most expensive food item
+                foodItemExpensive = this._stock[i];
+        }
+        return foodItemExpensive;
+    }
+
+    /**
+     * The function calculate the items on the store
+     *
+     * @return sum of items in the store
+     */
+    public int howManyPieces() {
+
+        //Counter
+        int piecesCount = 0;
+
+        //Go through all the stock
+        for (int i = 0; i < this._numOfItems; i++) {
+
+            //Add to calculation
+            piecesCount += this._stock[i].getQuantity();
+        }
+        return piecesCount;
+    }
+
+    /**
+     * The function create String contain all the store's items in the format:
+     * FoodItem: Milk Catalogue num:1234 ProductionDate: 14/12/2019 ExpiryDate: 17/12/ 2019 Quantity: 3
+     *
+     * @return the created string that contain the items in the format below
+     */
+    public String toString() {
+
+        String strStock = "";
+
+        //Go through all the items
+        for (int i = 0; i < this._numOfItems; i++) {
+
+            //Add the items to the String and add line break
+            strStock += (this._stock[i].toString()) + '\n';
+        }
+        //The created String
+        return strStock;
+    }
+
+    /**
+     * The function get items that the store sell and remove the bought amount from the stock
+     *
+     * @param itemsList the items that they sell
+     */
+    public void updateStock(String[] itemsList) {
+
+        //Go through all the given list
+        for (int i = 0; i < itemsList.length; i++) {
+
+            //Go through the stock
+            for (int j = 0; j < this._numOfItems; j++) {
+
+                if (this._stock[j].getName().equals(itemsList[0])) {
+
+                    //Remove the item from the given list
+                    this.deleteFromArray(itemsList);
+
+                    //Check if the item stock finished
+                    if (this._stock[j].getQuantity() == 0) {
+                        //Delete the item from stock
+                        this.deleteFoodItemFromArray(j);
+                        j--;
+                    } else
+                        //reduce the object's quantity
+                        this._stock[j].setQuantity(this._stock[j].getQuantity() - 1);
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * The function get  index and array and delete the object in the index place from the given array
+     *
+     * @param items the object array
+     */
+    private void deleteFromArray(String[] items) {
+
+        //Go through the array from the index
+        for (int i = 0; i < items.length - 1; i++) {
+
+            //Shift right each object
+            items[i] = items[i + 1];
+        }
+
+        //Set the last object to null
+        items[items.length - 1] = null;
+
+    }
+
+    /**
+     * The function check if there is temperature that fits to all food items
+     *
+     * @return if there is temperature range that fits all items,
+     * return the range min temperature otherwise return the maximum integer value
+     */
+    public int getTempOfStock() {
+
+        //Set parameters to be un valid to all food items
+        //If there is no food items, the function will return the integer max value
+        int maxTemperature = 0;
+        int minTemperature = 1;
+
+        //Check if there is any food items
+        if (this._numOfItems > 0) {
+
+            //Set the first food item's min and max valid temperature
+            maxTemperature = this._stock[0].getMaxTemperature();
+            minTemperature = this._stock[0].getMinTemperature();
+
+            //Go through all the food items
+            for (int i = 1; i < this._numOfItems; i++) {
+
+                //Update the stock's min and max temperature for all items
+                minTemperature = Math.max(minTemperature, this._stock[i].getMinTemperature());
+                maxTemperature = Math.min(maxTemperature, this._stock[i].getMaxTemperature());
+            }
+        }
+
+        //if there is any valid range return the min temperature
+        //otherwise return the integer max value
+        return minTemperature <= maxTemperature ? minTemperature : Integer.MAX_VALUE;
+
+
+    }
+
+}
