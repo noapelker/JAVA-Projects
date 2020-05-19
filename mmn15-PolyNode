@@ -1,0 +1,193 @@
+/**
+ * Maman 15 q1
+ * This class represent single polynode
+ * Author: Noa Apelker
+ * Date: 08/02/20
+ */
+
+public class PolyNode {
+
+    //The parameters
+    private int _power;
+    private double _coefficient;
+    private static final int MIN_VALUE = 0;
+    private PolyNode _next;
+
+    /**
+     * The constructor
+     * The function get power and coefficient and set the polynode values
+     *
+     * @param power       the power to set to
+     * @param coefficient the coefficient to set to
+     *                    runtime complexity O(1)
+     *                    space complexity O(1)
+     */
+    public PolyNode(int power, double coefficient) {
+        this.setPowerAndCoefficient(power, coefficient);
+        this._next = null;
+    }
+
+    /**
+     * The constructor
+     * The function get power, coefficient and the next polynode value and set the value accordingly
+     *
+     * @param power       the power to set to
+     * @param coefficient the coefficient to set to
+     * @param next        the next pointer on list
+     *                    runtime complexity O(1)
+     *                    space complexity O(1)
+     */
+    public PolyNode(int power, double coefficient, PolyNode next) {
+
+        //Call the function that set the power and coefficient according to the conditions
+        this.setPowerAndCoefficient(power, coefficient);
+        this._next = next;
+    }
+
+    /**
+     * The constructor
+     * get polynode and copy his value
+     *
+     * @param p the polynode to copy
+     *          runtime complexity O(1)
+     *          space complexity O(1)
+     */
+    public PolyNode(PolyNode p) {
+        this._power = p._power;
+        this._coefficient = p._coefficient;
+        this._next = p._next;
+    }
+
+    /**
+     * Get function
+     *
+     * @return the power
+     * runtime complexity O(1)
+     * space complexity O(1)
+     */
+    public int getPower() {
+        return this._power;
+    }
+
+    /**
+     * Get function
+     *
+     * @return the coefficient
+     * runtime complexity O(1)
+     * space complexity O(1)
+     */
+    public double getCoefficient() {
+        return this._coefficient;
+    }
+
+    /**
+     * Get function
+     *
+     * @return the next pointer
+     * runtime complexity O(1)
+     * space complexity O(1)
+     */
+    public PolyNode getNext() {
+        return this._next;
+    }
+
+    /**
+     * Set function
+     *
+     * @param power get power and set the value accordingly
+     *              runtime complexity O(1)
+     *              space complexity O(1)
+     */
+    public void setPower(int power) {
+
+        //Set it only when the value is valid
+        if (power >= MIN_VALUE) {
+            this._power = power;
+        }
+    }
+
+    /**
+     * Set function
+     *
+     * @param coefficient to copy his value
+     *                    runtime complexity O(1)
+     *                    space complexity O(1)
+     */
+    public void setCoefficient(double coefficient) {
+        this._coefficient = coefficient;
+    }
+
+    /**
+     * Set function
+     *
+     * @param next set the next pointer
+     *             runtime complexity O(1)
+     *             space complexity O(1)
+     */
+    public void setNext(PolyNode next) {
+        this._next = next;
+    }
+
+    /**
+     * The function create a string format to the polynode
+     *
+     * @return the string format
+     * runtime complexity O(1)
+     * space complexity O(1)
+     */
+    public String toString() {
+        String str = "";
+
+        //Check if the value need to be includes in the string
+        if (this._coefficient != 0) {
+
+            if (this._power == 0) {
+
+                //Return the value without the power
+                return String.valueOf(this._coefficient);
+            }
+            if (this._coefficient == -1 || this._coefficient == 1) {
+
+                //Format fits to 1 & -1
+                str = this._coefficient == 1 ? "x" : "-x";
+            } else
+
+                //Add the coefficient value before x
+                str = this._coefficient + "x";
+            if (this._power == 1)
+
+                //Return the str without power
+                return str;
+
+            //Add the power to the str
+            str += "^" + this._power;
+
+        }
+        //The created string
+        return str;
+    }
+
+    /**
+     * The function get coefficient and power and set the values according the conditions
+     *
+     * @param power       the power to set to
+     * @param coefficient the coefficient to set to
+     *                    runtime complexity O(1)
+     *                    space complexity O(1)
+     */
+    private void setPowerAndCoefficient(int power, double coefficient) {
+
+        //Check whether the power is'nt valid
+        if (power < MIN_VALUE) {
+
+            //Set the coefficient and power to zero
+            this._coefficient = MIN_VALUE;
+            this._power = MIN_VALUE;
+        } else {
+
+            //The power is valid- set the parameters
+            this._power = power;
+            this._coefficient = coefficient;
+        }
+    }
+}
