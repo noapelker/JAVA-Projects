@@ -1,0 +1,294 @@
+/**
+ * Maman 12 q2
+ * This class represent ta food item
+ * Author: Noa Apelker
+ * Date: 13/12/19
+ * */
+public class FoodItem {
+
+    //All the food item identifiers
+    private final String _name;
+    private final long _catalogueNumber;
+    private int _quantity;
+    private Date _productionDate;
+    private Date _expiryDate;
+    private final int _minTemperature;
+    private final int _maxTemperature;
+    private int _price;
+
+    //Catalog number's min and max value
+    private final static int MIN_CATALOG_NUMBER = 1000;
+    private final static int MAX_CATALOG_NUMBER = 9999;
+
+    //Default name and price value's
+    private final static String DEFAULT_NAME = "item";
+    private final static int DEFAULT_PRICE = 1;
+
+    //Min price and quantity value's
+    private final static int MIN_PRICE = 0;
+    private final static int MIN_QUANTITY = 0;
+
+    /**
+     * Constructor.
+     * Set the parameters according to the given parameters and their validness
+     * id any given parameter isn't valid, set the parameter to default
+     *
+     * @param name            food item's name
+     * @param catalogueNumber food item's catalog number
+     * @param quantity        food item's quantity
+     * @param productionDate  food item's production date
+     * @param expiryDate      food item's expiry date
+     * @param minTemperature  food item's min temperature
+     * @param maxTemperature  food item's max temperature
+     * @param price           food item's price
+     */
+    public FoodItem(String name, long catalogueNumber, int quantity,
+                    Date productionDate, Date expiryDate, int minTemperature,
+                    int maxTemperature, int price) {
+
+        //Checking if the given name is empty.
+        //if it does, set to default, otherwise set to the given name
+        this._name = name.isEmpty() ? DEFAULT_NAME : name;
+
+        //Checking whether the given catalog number is valid.
+        //Set it to the given parameter if it does other wise change it to default
+        this._catalogueNumber = (catalogueNumber >= MIN_CATALOG_NUMBER &&
+                catalogueNumber <= MAX_CATALOG_NUMBER) ? catalogueNumber : MAX_CATALOG_NUMBER;
+
+        //Checking if the giving price is positive
+        //If it's doesnt, set to the min value otherwise to the given value
+        this._price = price < MIN_PRICE ? DEFAULT_PRICE : price;
+        this._productionDate = new Date(productionDate);
+
+        //Check if the expiry date is after the productionDate.
+        //If it does, set it to the givin date, otherwise set it to productionDate's next date
+        this._expiryDate = expiryDate.after(productionDate) ? new Date(expiryDate) : productionDate.tomorrow();
+
+        //If the given value is negative, set to 0.
+        // otherwise set to given value
+        this._quantity = Math.max(quantity, MIN_QUANTITY);
+
+        //Set the min, max temperature to the min, max value between the two temperature
+        if (minTemperature < maxTemperature) {
+            this._minTemperature = minTemperature;
+            this._maxTemperature = maxTemperature;
+        } else {
+            this._minTemperature = maxTemperature;
+            this._maxTemperature = minTemperature;
+        }
+    }
+
+    /**
+     * Constructor
+     * Create copy of the given food item
+     *
+     * @param other the food item to duplicate
+     */
+    public FoodItem(FoodItem other) {
+        this._name = other.getName();
+        this._catalogueNumber = other.getCatalogueNumber();
+        this._quantity = other.getQuantity();
+        this._productionDate = other.getProductionDate();
+        this._expiryDate = other.getExpiryDate();
+        this._minTemperature = other.getMinTemperature();
+        this._maxTemperature = other.getMaxTemperature();
+        this._price = other.getPrice();
+    }
+
+    /**
+     * Set function to production date.
+     * Check if the given date is before expiry date
+     *
+     * @param d the production date
+     */
+    public void setProductionDate(Date d) {
+
+        //Check if the given date is before expire date
+        if (this._expiryDate.after(d))
+            this._productionDate = new Date(d);
+    }
+
+    /**
+     * Parse the food item's values to String by given format.
+     *
+     * @return String representing the food item value by the following format:
+     * "FoodItem: milk CatalogueNumber: 1234 ProductionDate: 14/12/2019 ExpiryDate: 21/12/2019 Quantity: 3"
+     */
+    public String toString() {
+        return "FoodItem: " + this._name + "\tCatalogueNumber: " + this._catalogueNumber +
+                "\tProductionDate: " + this._productionDate.toString() + "\tExpiryDate: " +
+                this._expiryDate.toString() + "\tQuantity: " + this._quantity;
+    }
+
+    /**
+     * Check if two food items are equals
+     *
+     * @return true if they are equals and false uf not
+     */
+    public boolean equals(FoodItem other) {
+        return this._name.equals(other._name) &&
+                this._catalogueNumber == other._catalogueNumber &&
+                this._expiryDate.equals(other._expiryDate) &&
+                this._productionDate.equals(other._productionDate) &&
+                this._minTemperature == other._minTemperature &&
+                this._maxTemperature == other._maxTemperature &&
+                this._price == other._price;
+    }
+
+    /**
+     * Check if the given date is after the production date and before the expiry date
+     *
+     * @param d the date to check
+     * @return true if the food is fresh in this date and false otherwise
+     */
+    public boolean isFresh(Date d) {
+
+        //Check if the given date is after the production creation date and before expiry date
+        return (d.after(this._productionDate) && d.before(this._expiryDate));
+    }
+
+    /**
+     * Check if the given production date is before or after the current food item's production date
+     *
+     * @param other the food item to compere with his production date
+     * @return true if the current food item create before the given food item
+     */
+    public boolean olderFoodItem(FoodItem other) {
+        return this._productionDate.before(other.getProductionDate());
+
+    }
+
+    /**
+     * Check how many food item the user can get with this amount and check if the store has this quantity
+     *
+     * @param amount amount of money to check with
+     * @return the how many food item's the client can buy with combination of his amount and the store quantity
+     */
+    public int howManyItems(int amount) {
+
+        //Return the amount that the user can buy with this amount and available
+        return Math.min((amount / this._price), this._quantity);
+    }
+
+    /**
+     * Check if the current food item is cheaper then the given one
+     *
+     * @param other food item to compere his price with
+     * @return true if the current FoodItem is cheaper then the given one and false otherwise.
+     */
+    public boolean isCheaper(FoodItem other) {
+
+        //Check if the current FoodItem price is cheaper then the given FoodItem's price
+        return this._price < other._price;
+    }
+
+    /**
+     * Set function
+     * Check if the price is valid and set it accordingly
+     *
+     * @param n to set to
+     */
+    public void setPrice(int n) {
+
+        //Check if the price is valid
+        if (n >= MIN_PRICE)
+            this._price = n;
+    }
+
+    /**
+     * Set function
+     * check if the expiry date is valid and set it accordingly
+     *
+     * @param d expiry date to check and change to
+     */
+    public void setExpiryDate(Date d) {
+        //Check if the given date is after the production date
+        if (d.after(this._productionDate))
+            this._expiryDate = new Date(d);
+    }
+
+    /**
+     * Set function
+     * check if the given parameter is valid and set it accordingly
+     *
+     * @param n to check and set to
+     */
+    public void setQuantity(int n) {
+
+        //Check if the given parameter is valid
+        if (n >= MIN_QUANTITY)
+            this._quantity = n;
+    }
+
+    /**
+     * Get function
+     *
+     * @return the quantity value
+     */
+    public int getQuantity() {
+        return this._quantity;
+    }
+
+    /**
+     * Get function
+     *
+     * @return the name
+     */
+    public String getName() {
+        return this._name;
+    }
+
+    /**
+     * Get function
+     *
+     * @return the catalogue number
+     */
+    public long getCatalogueNumber() {
+        return this._catalogueNumber;
+    }
+
+    /**
+     * Get function
+     *
+     * @return production date
+     */
+    public Date getProductionDate() {
+        return new Date(this._productionDate);
+    }
+
+    /**
+     * Get function
+     *
+     * @return the expiry date
+     */
+    public Date getExpiryDate() {
+        return new Date(this._expiryDate);
+    }
+
+    /**
+     * Get function
+     *
+     * @return min temperature
+     */
+    public int getMinTemperature() {
+        return this._minTemperature;
+    }
+
+    /**
+     * Get function
+     *
+     * @return max temperature
+     */
+    public int getMaxTemperature() {
+        return this._maxTemperature;
+    }
+
+    /**
+     * Get function
+     *
+     * @return the price
+     */
+    public int getPrice() {
+        return this._price;
+    }
+}
