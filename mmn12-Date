@@ -1,0 +1,336 @@
+/**
+ * Maman 12 q1
+ * This class represent a date
+ * Author: Noa Apelker
+ * Date: 13/12/19
+ */
+public class Date {
+    //Represent a day (between 1-31)
+    private int _day;
+
+    //Represent a month (between 1-12)
+    private int _month;
+
+    //Represent a year (4 digits)
+    private int _year;
+
+    //Min day value
+    private final static int MIN_DAYS_A_MONTH = 1;
+
+    private final static int FEBRUARY = 2;
+
+    //Min and max months value
+    private final static int MIN_MONTHS_A_YEAR = 1;
+    private final static int MAX_MONTHS_A_YEAR = 12;
+
+    //Min and max year value
+    private final static int MAX_YEAR = 9999;
+    private final static int MIN_YEAR = 1000;
+
+    private final static int DEFAULT_DAY = 1;
+    private final static int DEFAULT_MONTH = 1;
+    private final static int DEFAULT_YEAR = 2000;
+
+    /**
+     * The constructor.
+     * Create new date object if the given parameter's are valid, otherwise create the date 1/1/2000. 
+     *
+     * @param day   day in the month(1-31)
+     * @param month month in the year (1-12)
+     * @param year  year (4 digit number)
+     */
+    public Date(int day, int month, int year) {
+
+        //Check if the given date is valid
+        if (this.checkDayValid(day, month, year)) {
+            this._day = day;
+            this._month = month;
+            this._year = year;
+        } else {
+            this._day = DEFAULT_DAY;
+            this._month = DEFAULT_MONTH;
+            this._year = DEFAULT_YEAR;
+        }
+    }
+
+    /**
+     * The constructor.
+     * Create new date object if the given parameter is valid, otherwise create the date 1/1/2000. 
+     *
+     * @param other the date details
+     */
+    public Date(Date other) {
+        this._day = other.getDay();
+        this._month = other.getMonth();
+        this._year = other.getYear();
+    }
+
+    /**
+     * Calculate how many days there is in the given month
+     *
+     * @param month holds the month to check
+     * @param year  holds the year to check
+     * @return how many days there is in the given month
+     */
+    private int maxDayOnMonth(int month, int year) {
+
+        //Formula that gives the day's per specific month
+        int maxDayMonth = 28 + (month + Math.floorDiv(month, 8)) % 2 + 2 % month + 2 * Math.floorDiv(1, month);
+
+        //Add one day to february in a leap year
+        if (month == FEBRUARY && this.isLeapYear(year))
+            maxDayMonth++;
+        return maxDayMonth;
+    }
+
+    /**
+     * Check if the guven year is a leap year
+     *
+     * @param year the year to check
+     * @return true the given year is leap year otherwise, false
+     */
+    private boolean isLeapYear(int year) {
+        return (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0));
+    }
+
+    /**
+     * Check if the given date equals to the date the function play on.
+     *
+     * @param date the date to compere to.
+     * @return true if the dates are equal's
+     */
+    public boolean equals(Date date) {
+
+        //Check if the day, month and year of the given date equals to other and return the result
+        return (date.getDay() == this._day && date.getMonth() == this._month && date.getYear() == this._year);
+    }
+
+    /**
+     * Check if the given day is valid.
+     *
+     * @param day   day to check.
+     * @param month month to check.
+     * @param year  year to check.
+     * @return true if the date is valid, false otherwise.
+     */
+    private boolean checkDayValid(int day, int month, int year) {
+
+        //Check if the given date is valid and return outcome
+        return ((day >= MIN_DAYS_A_MONTH) && (day <= this.maxDayOnMonth(month, year)) && (month >= MIN_MONTHS_A_YEAR) &&
+                (month <= MAX_MONTHS_A_YEAR) && (year >= MIN_YEAR) && (year <= MAX_YEAR)
+        );
+    }
+
+    /**
+     * Check if the current date before the given date
+     *
+     * @param date date to check with
+     * @return true if the current date is before the given date and false if its after.
+     */
+    public boolean before(Date date) {
+
+        //Given date's day's passed from the begging of christian counting
+        int otherDateDays = this.calculateDate(date.getDay(), date.getMonth(), date.getYear());
+
+        //Current date's day's passed from the begging of christian counting
+
+        int dateDays = this.calculateDate(this.getDay(), this.getMonth(), this.getYear());
+
+        //Return whether the current date is before or not
+        return dateDays < otherDateDays;
+    }
+
+    /**
+     * Check if the current date is after the given date
+     *
+     * @param other the date to check with
+     * @return true if the current date is after the given date and false otherwise
+     */
+    public boolean after(Date other) {
+
+        //True if given date object is before this object
+        return other.before(this);
+    }
+
+    /**
+     * Calculate the day's difference between the current date to the given date
+     *
+     * @param other the date to compere to
+     * @return the absolute difference between the date's
+     */
+    public int difference(Date other) {
+
+        //Calculate the day's since the beginning of the christian counting for the current and given date
+        int currentDateDays = this.calculateDate(this.getDay(), this.getMonth(), this.getYear());
+        int otherDateDays = this.calculateDate(other.getDay(), other.getMonth(), other.getYear());
+
+        //Return the absolute difference between the date's
+        return Math.abs(currentDateDays - otherDateDays);
+    }
+
+    /**
+     * Calculate the day in the week  (0-Saturday, 6-Friday)
+     *
+     * @return the day in the week
+     */
+    public int dayInWeek() {
+
+        //The current day, month and year
+        int day = this.getDay();
+        int month = this.getMonth();
+        int year = this.getYear() % 100;
+
+        //Check whether the month is february or january and set then to the last month last year
+        if (this._month < 3) {
+
+            //Set the year to last year and the month to the the last in this year (february-14 january-13)
+            year--;
+            month += 12;
+        }
+
+        //The 2 first digits of the year
+        int century = Math.floorDiv(year, 100);
+
+        //Formula that calculate the which day this date in the week
+        return (day + (26 * (month + 1)) / 10 + year + year / 4 + century / 4 - 2 * century) % 7;
+    }
+
+    /**
+     * Calculate the next day date if the next  day invalid, create the default date (1.1.2000)
+     *
+     * @return the date tomorrow
+     */
+    public Date tomorrow() {
+
+        int day = this.getDay();
+        int month = this.getMonth();
+        int year = this.getYear();
+        //Check if the next day is valid for this month
+        // If it's valid, create the next date and return it
+        if (this.checkDayValid(day + 1, month, year))
+            return new Date(day + 1, month, year);
+
+            //Check if the next month and year is not valid
+            //if they doesnt valid, create the default date (1,1,2000) and return it
+        else if (month + 1 > MAX_MONTHS_A_YEAR && year + 1 > MAX_YEAR) {
+            return new Date(DEFAULT_DAY, DEFAULT_MONTH, year + 1);
+        }
+
+        //Check if the month invalid
+        //If it does- meaning not valid day, not valid month but valid year
+        else if (month + 1 > MAX_MONTHS_A_YEAR) {
+            //Create and return the first day of the first month next year
+            return new Date(MIN_DAYS_A_MONTH, MIN_MONTHS_A_YEAR, year + 1);
+        }
+
+        //If we got here meaning - invalid day but valid month and year
+        return new Date(MIN_DAYS_A_MONTH, month + 1, year);
+    }
+
+    /**
+     * Set String format to the date
+     *
+     * @return the date as string in format dd/mm/yyyy
+     */
+    public String toString() {
+        return (this.twoDigitString(this.getDay()) + '/' + this.twoDigitString(this.getMonth())
+                + '/' + this.getYear());
+    }
+
+    /**
+     * Transform one digit number to two digits
+     *
+     * @param num the number to check and transform
+     * @return the number as two digit number
+     */
+    private String twoDigitString(int num) {
+        return num < 10 ? "0" + num : "" + (num);
+    }
+
+    /**
+     * Calculate the days since the beginning of the christian counting of years
+     *
+     * @param day   the date's day
+     * @param month the date's month
+     * @param year  the date's year
+     * @return number of days passed from the from the beginning of the christian counting
+     */
+    private int calculateDate(int day, int month, int year) {
+        if (month < 3) {
+            year--;
+            month += 12;
+        }
+
+        //Formula that calculate number of days since the beginning of the christian counting
+        //Return the value
+        return 365 * year + year / 4 - year / 100 + year / 400 + ((month + 1) * 306) / 10 + (day - 62);
+    }
+
+    /**
+     * Get function
+     *
+     * @return the day
+     */
+    public int getDay() {
+        return this._day;
+    }
+
+    /**
+     * Get function.
+     *
+     * @return the month.
+     */
+    public int getMonth() {
+        return this._month;
+    }
+
+    /**
+     * Get function.
+     *
+     * @return the year.
+     */
+    public int getYear() {
+        return this._year;
+    }
+
+    /**
+     * Set function to day.
+     * Check if the given day is valid, if it does, set the day to the given day.
+     *
+     * @param dayToSet the day to check and change to.
+     */
+    public void setDay(int dayToSet) {
+        if (dayToSet >= MIN_DAYS_A_MONTH && dayToSet < this.maxDayOnMonth(this._month, this._year))
+            this._day = dayToSet;
+    }
+
+    /**
+     * Set function to month
+     * Check if the given month is valid, if it does, set the month to the given month.
+     *
+     * @param monthToSet the month to check and change to.
+     */
+    public void setMonth(int monthToSet) {
+
+        //Check if the given month is valid
+        boolean isValidMonth = monthToSet >= MIN_MONTHS_A_YEAR && monthToSet <= MAX_MONTHS_A_YEAR;
+
+        //Check if the month fits to the current day
+        if (isValidMonth && this._day <= this.maxDayOnMonth(monthToSet, this._year))
+            this._month = monthToSet;
+    }
+
+    /**
+     * Set function.
+     * Check if the given year is valid. if it does, set the year to the given year.
+     *
+     * @param yearToSet the year to check and change to.
+     */
+    public void setYear(int yearToSet) {
+
+        //If the current month is february - check
+        boolean isValidToFebruary = !(this._month == FEBRUARY && this._day == 29 && !isLeapYear(yearToSet));
+        if (isValidToFebruary && yearToSet >= MIN_YEAR && yearToSet <= MAX_YEAR)
+            this._year = yearToSet;
+    }
+}
