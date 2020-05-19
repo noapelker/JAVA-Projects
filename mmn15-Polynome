@@ -1,0 +1,280 @@
+/**
+ * Maman 15 q2
+ * This class represent Polynom built by polynodes
+ * Author: Noa Apelker
+ * Date: 08/02/20
+ */
+public class Polynom {
+
+    private PolyNode _head;
+    private static final int INVALID_VALUE = -1;
+
+    /**
+     * The constructor
+     * The function create an empty polynom
+     * runtime complexity O(1)
+     * space complexity O(1)
+     */
+    public Polynom() {
+        this._head = null;
+    }
+
+    /**
+     * The constructor
+     * The function get Polynode and copy it
+     *
+     * @param p the Polynode to copy
+     *          runtime complexity O(1)
+     *          space complexity O(1)
+     */
+    public Polynom(PolyNode p) {
+        this._head = p;
+    }
+
+    /**
+     * Get function.
+     *
+     * @return the polynode pointer
+     * runtime complexity O(1)
+     * space complexity O(1)
+     */
+    public PolyNode getHead() {
+        return this._head;
+    }
+
+    /**
+     * Set function.
+     * The function get polynode and copy it
+     *
+     * @param p thr polynode to copy
+     *          runtime complexity O(1)
+     *          space complexity O(1)
+     */
+
+    public void setHead(PolyNode p) {
+        this._head = p;
+    }
+
+    /**
+     * The function get polynode and add his value to the polynom
+     *
+     * @param p the polynode to add to the polynom
+     * @return the created polynom
+     * runtime complexity O(n)
+     * space complexity O(1)
+     */
+    public Polynom addNode(PolyNode p) {
+
+        //Check if its the first polynode in the polynom
+        if (this._head != null) {
+
+            //Create new pointer on the list
+            PolyNode list = this._head;
+            PolyNode prev = null;
+
+            //Go on the list and search for power fits to the polynode
+            //The power can be either the same or smaller (the polynode will go before)
+            while (list != null && list.getPower() > p.getPower()) {
+
+                //Save the prev polynode on the list and move the lust to the next value
+                prev = list;
+                list = list.getNext();
+            }
+
+            //Check if the list is'nt empty
+            if (list != null) {
+
+                //Check if this specific power value exist
+                if (p.getPower() == list.getPower())
+
+                    //Add the value to the polynom
+                    list.setCoefficient(list.getCoefficient() + p.getCoefficient());
+
+                    //The polynode power isnt the biggest or the smallest
+                    //need to be insert somewhere between prev pointer and the list current pointer
+                else if (prev != null) {
+                    p.setNext(list);
+                    prev.setNext(p);
+                }
+
+                //The given polynode has the biggest power, need to be first
+                else {
+
+                    //Set the given polynode first and set the class list to this pointer
+                    p.setNext(list);
+                    this._head = p;
+                }
+            } else
+
+                //The polynode has the smallest power and need to be insert last
+                prev.setNext(p);
+        } else
+
+            //The list is empty.
+            //Set the pointer to the given polynode
+            this._head = p;
+
+        //Return the polynom
+        return this;
+    }
+
+    /**
+     * The function create a string format of the polynom
+     *
+     * @return the created string format of the polynom
+     * runtime complexity O(n)
+     * space complexity O(1)
+     */
+    public String toString() {
+        String str = "";
+
+        //Go through all the nodes and add them to the string by the wanted format
+        for (PolyNode p = this._head; p != null; p = p.getNext()) {
+            str += p.toString();
+
+            //Check if the next node exist and has as a positive value
+            if (p.getNext() != null && p.getNext().getCoefficient() > 0)
+                str += "+";
+        }
+        //Return the created string
+        return str;
+    }
+
+    /**
+     * The function get integer and multiplicand his value in the polynom
+     *
+     * @param num the scalar to multiplicand his value with the polynom
+     * @return the created polynom
+     * runtime complexity O(n)
+     * space complexity O(1)
+     */
+    public Polynom multByScalar(int num) {
+
+        //Go through all the polynom and mult the polynom by the given scalar
+        for (PolyNode p = this._head; p != null; p = p.getNext()) {
+            p.setCoefficient(p.getCoefficient() * num);
+        }
+        //The created polynom
+        return this;
+    }
+
+
+    /**
+     * The function get polynom and his the polynom to the current polynom
+     *
+     * @param other the polynom to add
+     * @return the sum of the teo polynoms
+     * runtime complexity O(n)
+     * space complexity O(1)
+     */
+    public Polynom addPol(Polynom other) {
+        if (other._head == null)
+            return this;
+        PolyNode prev = null;
+        PolyNode p1 = _head;
+        PolyNode p2 = other._head;
+
+        while (p1 != null || p2 != null) {
+
+            //Check if the nodes isn't null and set the power accordingly
+            int power1 = p1 != null ? p1.getPower() : INVALID_VALUE;
+            int power2 = p2 != null ? p2.getPower() : INVALID_VALUE;
+
+            //The nodes has the same poower
+            if (power1 == power2) {
+                p1.setCoefficient(p1.getCoefficient() + p2.getCoefficient());
+
+                //Save the prev vakue
+                prev = p1;
+                p1 = p1.getNext();
+                p2 = p2.getNext();
+            }
+            //The given value has smaller power then the current value
+            else if (power1 > power2) {
+                prev = p1;
+                p1 = p1.getNext();
+            }
+
+            //The given current node has bigger power.
+            else {
+                PolyNode node = new PolyNode(p2);
+
+                //Add the polynode value before the current polynom value
+                node.setNext(p1);
+                p1 = node;
+
+                //Is the first node
+                if (prev == null)
+                    this._head = node;
+                else
+                    prev.setNext(node);
+                p2 = p2.getNext();
+            }
+        }
+
+        //Return the 2 polynom's sum
+        return this;
+    }
+
+    /**
+     * The function get polynom and multiplicand it with the current polynom
+     *
+     * @param other the polynom to multiplicand his value with the current polynom
+     * @return the created multiplicand polynom
+     */
+    public Polynom multPol(Polynom other) {
+        Polynom poly = new Polynom();
+
+        //Go through all the given and current polynode's
+        for (PolyNode p = other.getHead(); p != null; p = p.getNext()) {
+            for (PolyNode p2 = this._head; p2 != null; p2 = p2.getNext()) {
+
+                //Add the node to the polynom
+                poly.addNode(new PolyNode(p.getPower() + p2.getPower(), p.getCoefficient() * p2.getCoefficient()));
+            }
+        }
+        //Return the created polynom
+        return poly;
+    }
+
+    /**
+     * The function calculate the function differential value
+     *
+     * @return the calculate differential
+     * runtime complexity O(n)
+     * space complexity O(1)
+     */
+    public Polynom differential() {
+
+        //Holds the list pointer
+        PolyNode p = this._head;
+        PolyNode prev = null;
+
+        //Go trough all the polynom
+        while (p != null && p.getPower() > 0) {
+
+            //Save current pointer
+            prev = p;
+
+            //Set the differential by the known differential formula
+            p.setCoefficient(p.getCoefficient() * p.getPower());
+            p.setPower(p.getPower() - 1);
+
+            //Go to the next polynode
+            p = p.getNext();
+            //The power is zero - un relevant to the differential
+        }
+        if (p != null) {
+            //The differential doesnt empty
+            if (prev != null) {
+                prev.setNext(null);
+            } else {
+
+                //The differential is empty
+                this._head = null;
+            }
+        }
+        //Return the created polynom
+        return this;
+    }
+}
